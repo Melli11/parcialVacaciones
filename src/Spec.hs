@@ -35,12 +35,12 @@ correrTests = hspec $ do
       deltaExcursionSegun stress ana irAlaPlaya `shouldBe` -3
   describe "laExcursionEsEducativa" $ do
     it "Una excursion es educativa para una persona si luego de realizarla aprende un idioma" $ do
-       laExcursionEsEducativa (Turista 4 10 False ["Castellano"]) (salirAHablarUnIdioma "frances")   `shouldBe` True 
+       esUnaExcursionEsEducativa (Turista 4 10 False ["Castellano"]) (salirAHablarUnIdioma "frances")   `shouldBe` True 
     it "Una excursion NO ES educativa para una persona si luego de realizarla NO aprende un idioma" $ do
-       laExcursionEsEducativa (Turista 4 10 False ["Castellano"]) (caminar 10)  `shouldBe` False 
+       esUnaExcursionEsEducativa (Turista 4 10 False ["Castellano"]) (caminar 10)  `shouldBe` False 
   describe "Excursion desestresante" $ do
     it "Una excursion es desestresante si luego de realizarla le redujo al menos 3 unidades de stress" $ do
-       laExcursionEsDesestresante (Turista 100 50 True ["Japones","Español"]) (apreciarAlgunElementoDelPaisaje "terremoto") `shouldBe` True
+       esUnaExcursionDesestresante (Turista 100 50 True ["Japones","Español"]) (apreciarAlgunElementoDelPaisaje "terremoto") `shouldBe` True
     it "Una excursion NO es desestresante si luego de realizarla NO le redujo al menos 3 unidades de stress" $ do
-       laExcursionEsDesestresante (Turista 100 5 True ["Japones","Español"]) (apreciarAlgunElementoDelPaisaje "es")  `shouldBe` False 
+       esUnaExcursionDesestresante (Turista 100 5 True ["Japones","Español"]) (apreciarAlgunElementoDelPaisaje "es")  `shouldBe` False 
   

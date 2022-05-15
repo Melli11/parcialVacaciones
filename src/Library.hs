@@ -22,7 +22,7 @@ modificarCansancioEn :: Number -> Turista -> Turista
 -- modificarCansancioEn cantidad (Turista (cansancio,stress) compania idiomas ) = Turista (cansancio + cantidad,stress) compania idiomas --Para la version con tupla energia
 modificarCansancioEn cantidad (Turista cansancio stress compania idiomas ) = Turista (cansancio + cantidad) stress  compania idiomas
 
-
+elTurisTaViajaAcompañado turista = not (viajaSolo turista)
 -- modificarCansancioEn cantidad 
 
 meloso :: Turista
@@ -111,8 +111,8 @@ deltaExcursionSegun indice unTurista excursion = deltaSegun indice (hacerUnaExcu
 -- i. Saber si una excursión es educativa para un turista, que implica que termina
 -- aprendiendo algún idioma.
 
-laExcursionEsEducativa ::  Turista -> Excursion  -> Bool
-laExcursionEsEducativa unTurista = (0<) . deltaExcursionSegun (length.idiomasQueHabla) unTurista
+esUnaExcursionEsEducativa ::  Turista -> Excursion  -> Bool
+esUnaExcursionEsEducativa unTurista = (0<) . deltaExcursionSegun (length.idiomasQueHabla) unTurista
 
 laExcursionEsEducativa' :: Excursion -> Turista  -> Bool
 laExcursionEsEducativa' excursion unTurista
@@ -125,8 +125,8 @@ cambiosEnElVocabularioDelTurista = deltaExcursionSegun (length.idiomasQueHabla)
 -- ii. Conocer las excursiones desestresantes para un turista. Estas son aquellas que le
 -- reducen al menos 3 unidades de stress al turista.
 
-laExcursionEsDesestresante :: Turista -> Excursion -> Bool
-laExcursionEsDesestresante unTurista  = (<= -3 ) . deltaExcursionSegun stress unTurista 
+esUnaExcursionDesestresante :: Turista -> Excursion -> Bool
+esUnaExcursionDesestresante unTurista  = (<= -3 ) . deltaExcursionSegun stress unTurista
 
 
 -- Para mantener a los turistas ocupados todo el día, la empresa vende paquetes de excursiones
@@ -143,3 +143,25 @@ tourLadoB = [paseoEnBarco Tranquila, irAlaPlaya, caminar 120]
 
 islaVecina = [paseoEnBarco Tranquila, irAlaPlaya, paseoEnBarco Tranquila]
 
+realizarTour :: Turista -> [Excursion] -> Turista
+realizarTour  unTurista tour  = modificarStressEn (length tour) $ foldl hacerUnaExcursion unTurista tour
+
+-- b. Dado un conjunto de tours, saber si existe alguno que sea convincente para un turista. Esto
+-- significa que el tour tiene alguna excursión desestresante la cual, además, deja al turista
+-- acompañado luego de realizarla.
+
+esUnTourConvincente :: Turista -> [Excursion] -> Bool
+esUnTourConvincente unTurista tour = elTurisTaViajaAcompañado $ (head $ filter (esUnaExcursionDesestresante unTurista) tour) unTurista
+
+-- laExcursionEsDesestresante :: Turista -> Excursion -> Bool
+-- laExcursionEsDesestresante unTurista  = (<= -3 ) . deltaExcursionSegun stress unTurista
+
+
+-- c. Saber la efectividad de un tour para un conjunto de turistas. Esto se calcula como la sumatoria
+-- de la espiritualidad recibida de cada turista a quienes les resultó convincente el tour.
+-- La espiritualidad que recibe un turista es la suma de las pérdidas de stress y cansancio tras el
+-- tour.
+
+-- efectividadDeUnTour grupoDeTuristas tour =  filter (flip esUnTourConvincente tour) 
+
+-- espiritualidad = 

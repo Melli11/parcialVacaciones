@@ -12,7 +12,7 @@ correrTests = hspec $ do
       irAlaPlaya (Turista 4 10 False ["Castellano"]) `shouldBe` Turista 4 (10-1) False ["Castellano"]
   describe "salirAHablarUnIdioma" $ do
     it "Sea un turista que sale a hablar un idioma entonces el turista aprende el idioma y ademas termina acompañado" $ do
-      salirAHablarUnIdioma "Aleman" (Turista 4 10 False ["Castellano"]) `shouldBe` Turista 4 10 True ["Aleman","Castellano"]
+      salirAHablarUnIdioma "Aleman" (Turista 4 10 True ["Castellano"]) `shouldBe` Turista 4 10 False ["Aleman","Castellano"]
   describe "apreciarAlgunElementoDelPaisaje" $ do
     it "Sea un turista que contempla el mar, entonces rudicirá su nivel de stress en 3 unidades" $ do
       apreciarAlgunElementoDelPaisaje "mar" (Turista 4 10 False ["Castellano"]) `shouldBe` Turista 4 (10-3) False ["Castellano"]
@@ -29,5 +29,18 @@ correrTests = hspec $ do
     it "Si un turista realiza un paseo con la marea MODERADA , no se verá afectado " $ do
       paseoEnBarco  Moderada sasuke `shouldBe` sasuke
     it "Si un turista realiza un paseo con la marea TRANQUILA, el turista hace sociales, camina 10', aprecia la vista del mar y sale a hablar aleman" $ do
-      paseoEnBarco  Tranquila (Turista 4 10 False ["Castellano"]) `shouldBe` Turista 6 4 True ["aleman","Castellano"]
-
+      paseoEnBarco  Tranquila (Turista 4 10 False ["Castellano"]) `shouldBe` Turista 6 4 False ["aleman","Castellano"]
+  describe "deltaExcursionSegun" $ do
+    it "La función deltaExcursionSegun indica la variacion del estado de una persona luego de hacer una excursion" $ do
+      deltaExcursionSegun stress ana irAlaPlaya `shouldBe` -3
+  describe "laExcursionEsEducativa" $ do
+    it "Una excursion es educativa para una persona si luego de realizarla aprende un idioma" $ do
+       laExcursionEsEducativa (Turista 4 10 False ["Castellano"]) (salirAHablarUnIdioma "frances")   `shouldBe` True 
+    it "Una excursion NO ES educativa para una persona si luego de realizarla NO aprende un idioma" $ do
+       laExcursionEsEducativa (Turista 4 10 False ["Castellano"]) (caminar 10)  `shouldBe` False 
+  describe "Excursion desestresante" $ do
+    it "Una excursion es desestresante si luego de realizarla le redujo al menos 3 unidades de stress" $ do
+       laExcursionEsDesestresante (Turista 100 50 True ["Japones","Español"]) (apreciarAlgunElementoDelPaisaje "terremoto") `shouldBe` True
+    it "Una excursion NO es desestresante si luego de realizarla NO le redujo al menos 3 unidades de stress" $ do
+       laExcursionEsDesestresante (Turista 100 5 True ["Japones","Español"]) (apreciarAlgunElementoDelPaisaje "es")  `shouldBe` False 
+  

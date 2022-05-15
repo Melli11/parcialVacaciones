@@ -48,13 +48,13 @@ apreciarAlgunElementoDelPaisaje :: String -> Turista -> Turista
 apreciarAlgunElementoDelPaisaje elemento = modificarStressEn ( (-1)* length elemento)
 
 salirAHablarUnIdioma :: String -> Turista -> Turista
-salirAHablarUnIdioma unIdioma (Turista cansancio stress _ idiomasQueSabe) = Turista cansancio stress True (unIdioma:idiomasQueSabe)
+salirAHablarUnIdioma unIdioma (Turista cansancio stress _ idiomasQueSabe) = Turista cansancio stress False (unIdioma:idiomasQueSabe)
 
 -- caminar :: Number -> Turista -> Turista
 -- caminar cantidadDeMinutos unTurista = unTurista {energia = afectarSegunTiempo cantidadDeMinutos (energia unTurista) }
 
 caminar :: Number -> Turista -> Turista
-caminar cantidadDeMinutos  = modificarCansancioEn (div cantidadDeMinutos 4) . modificarStressEn (div (-cantidadDeMinutos) 4)  
+caminar cantidadDeMinutos  = modificarCansancioEn (div cantidadDeMinutos 4) . modificarStressEn (div (-cantidadDeMinutos) 4)
 
 -- afectarSegunTiempo :: Number -> (Number, Number) -> (Number, Number)
 -- afectarSegunTiempo tiempo (cansancio,stress) =  (cansancio + tiempo/4,stress - tiempo/4)
@@ -70,12 +70,12 @@ paseoEnBarco Moderada unTurista = unTurista
 
 -- Crear un modelo para los turistas y crear los siguientes tres ejemplos:
 -- Ana: está acompañada, sin cansancio, tiene 21 de stress y habla español.
-ana = Turista 0 21 True ["Español"]
+ana = Turista 0 21 False ["Español"]
 
 -- Beto y Cathi, que hablan alemán, viajan solos, y Cathi además habla catalán. Ambos tienen 15
 -- unidades de cansancio y stress.
-beto = Turista 15 15 False ["Aleman"]
-cathi = Turista 15 15 False ["Aleman","Catalan"]
+beto = Turista 15 15 True ["Aleman"]
+cathi = Turista 15 15 True ["Aleman","Catalan"]
 
 -- 2. Modelar las excursiones anteriores de forma tal que para agregar una excursión al sistema no haga
 -- falta modificar las funciones existentes. Además:
@@ -89,8 +89,8 @@ type Excursion = Turista -> Turista
 stressDelTuristaEn10Menos :: Turista -> Turista
 stressDelTuristaEn10Menos  (Turista cansancio stress compania idiomas ) =  Turista cansancio (stress*0.90) compania idiomas
 
-hacerUnaExcursion :: Turista -> Excursion -> Turista 
-hacerUnaExcursion  unTurista =  stressDelTuristaEn10Menos .  aplicarExcursion unTurista 
+hacerUnaExcursion :: Turista -> Excursion -> Turista
+hacerUnaExcursion  unTurista =  stressDelTuristaEn10Menos .  aplicarExcursion unTurista
 
 aplicarExcursion unTurista excursion = excursion unTurista
 
@@ -100,8 +100,46 @@ aplicarExcursion unTurista excursion = excursion unTurista
 deltaSegun :: (a -> Number) -> a -> a -> Number
 deltaSegun f algo1 algo2 = f algo1 - f algo2
 
--- deltaExcursionSegun indice unTurista excursion = 
-
 -- Definir la función deltaExcursionSegun que a partir de un índice, un turista y una excursión
 -- determine cuánto varió dicho índice después de que el turista haya hecho la excursión.
 -- Llamamos índice a cualquier función que devuelva un número a partir de un turista
+
+deltaExcursionSegun :: (Turista -> Number) -> Turista -> Excursion -> Number
+deltaExcursionSegun indice unTurista excursion = deltaSegun indice (hacerUnaExcursion unTurista excursion) unTurista
+
+-- Usar la función anterior para resolver cada uno de estos puntos:
+-- i. Saber si una excursión es educativa para un turista, que implica que termina
+-- aprendiendo algún idioma.
+
+laExcursionEsEducativa ::  Turista -> Excursion  -> Bool
+laExcursionEsEducativa unTurista = (0<) . deltaExcursionSegun (length.idiomasQueHabla) unTurista
+
+laExcursionEsEducativa' :: Excursion -> Turista  -> Bool
+laExcursionEsEducativa' excursion unTurista
+    | cambiosEnElVocabularioDelTurista unTurista excursion  == 0 = False
+    | otherwise = True
+
+cambiosEnElVocabularioDelTurista :: Turista -> Excursion -> Number
+cambiosEnElVocabularioDelTurista = deltaExcursionSegun (length.idiomasQueHabla)
+
+-- ii. Conocer las excursiones desestresantes para un turista. Estas son aquellas que le
+-- reducen al menos 3 unidades de stress al turista.
+
+laExcursionEsDesestresante :: Turista -> Excursion -> Bool
+laExcursionEsDesestresante unTurista  = (<= -3 ) . deltaExcursionSegun stress unTurista 
+
+
+-- Para mantener a los turistas ocupados todo el día, la empresa vende paquetes de excursiones
+-- llamados tours. Un tour se compone por una serie de excursiones.
+
+-- - Completo: Comienza con una caminata de 20 minutos para apreciar una "cascada", luego se
+-- camina 40 minutos hasta una playa, y finaliza con una salida con gente local que habla
+-- "melmacquiano".
+
+tourCompleto :: [Excursion]
+tourCompleto = [caminar 20, apreciarAlgunElementoDelPaisaje "cascada", caminar 40, salirAHablarUnIdioma "melmaquiano"]
+
+tourLadoB = [paseoEnBarco Tranquila, irAlaPlaya, caminar 120]
+
+islaVecina = [paseoEnBarco Tranquila, irAlaPlaya, paseoEnBarco Tranquila]
+

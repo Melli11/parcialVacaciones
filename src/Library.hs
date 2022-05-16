@@ -63,9 +63,9 @@ data NiveldeLaMarea = Fuerte | Moderada | Tranquila
 
 -- paseoEnBarco ::  NiveldeLaMarea -> Turista -> Turista
 paseoEnBarco :: NiveldeLaMarea -> Turista -> Turista
-paseoEnBarco Fuerte unTurista = (modificarStressEn 6 . modificarCansancioEn 10) unTurista
-paseoEnBarco Tranquila unTurista = caminar 10 . apreciarAlgunElementoDelPaisaje "mar" $ salirAHablarUnIdioma "aleman" unTurista
-paseoEnBarco Moderada unTurista = unTurista
+paseoEnBarco Fuerte  = modificarStressEn 6 . modificarCansancioEn 10
+paseoEnBarco Tranquila  = caminar 10 . apreciarAlgunElementoDelPaisaje "mar" . salirAHablarUnIdioma "aleman"
+paseoEnBarco Moderada  = id
 
 
 -- Crear un modelo para los turistas y crear los siguientes tres ejemplos:
